@@ -36,7 +36,7 @@ var bf_interpreter = function( options ){
 		,run: function( callback, code ){
 			if( code ) program = code;
 			while (pc !== program.length){
-				//console.log("step:"+pc+"  "+program[pc]);
+		//		console.log("step:"+pc+"  "+program[pc]);
 				switch (program[pc]){
 					case '+': 
 						if( !inc() ){ 
@@ -162,13 +162,13 @@ var bf_interpreter = function( options ){
 	
 	function prnt(){//	.
 		output += String.fromCharCode( tape[pointer] % 255 );
-	//	console.log("print:"+tape[pointer]+" asChar:"+String.fromCharCode( tape[pointer] % 255 ) );
 		return true;
 	}
 	
 	function scan(){//	,
 		if( input.length === 0 ){
-			return false;
+			tape[pointer] = 0;
+			return true;
 		}
 		tape[pointer] = input.charCodeAt(0);
 		input = input.slice(1);
@@ -177,13 +177,10 @@ var bf_interpreter = function( options ){
 	
 	function loop(){//	[
 		if( tape[pointer] === 0 ){
-			console.log("must loop");
 			let pcBackup = pc;
 			pc++;
 			let indent = 0;
-				console.log("bip "+pc+ " " + program[pc]);
 			while( program[pc] !== ']' || indent !== 0){
-				console.log("bip "+pc+ " " + program[pc]);
 				
 				if( program[pc] === '[' ){
 					indent++;
@@ -196,23 +193,18 @@ var bf_interpreter = function( options ){
 					return error( "unmatched braces, start at: " + pcBackup + " indent level at end of program: " + indent );
 				}
 			}
-			console.log("loop skipped to "+pc+ " from "+pcBackup); 
 		}
 		return true;
 	}
-	
 	function endl(){//	]
 		var pcBackup = pc;
 		var indent = 0;
-		
-		//console.log("endl:: "+pc+" "+program[pc]);
-		while(pc-- && program[pc] !== '[' || indent !== 0 ){
-		//	console.log("endl "+pc+" "+program[pc] + " i:"+indent);
+		while(--pc && program[pc] !== '[' || indent !== 0 ){
 			if( program[pc] === '[' && indent !== 0 ){
-				indent++;
-			}
-			if( program[pc] === ']' && indent !== 0 ){
 				indent--;
+			}
+			if( program[pc] === ']' ){
+				indent++;
 			}
 			if( pc < 0 ){
 				return error( "Unmatched braces, ending brace found at: "+ pcBackup + ", indent level to start of program: "+indent89 );
