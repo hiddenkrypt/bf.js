@@ -1,6 +1,6 @@
 A Brainfuck Language interpreter written in javascript.
 
-Includes unit tests.
+Includes unit tests, though more coverage is needed. 
 
 ## Use
 A new default Brainfuck Interpreter is made by calling `new BrainFuckInterpreter()`
@@ -15,15 +15,19 @@ API:
 
 `.run(function, "")` runs the interpreter, with the string (if provided) as a program. The function provided will be called when (if) the program terminates. This callback function should take a string, which will be the output of the BrainFuck program.
 
-## options
+## Options
 
 The BrainFuckInterpreter can be initialized with options: `new BrainFuckInterpreter(integer)`
 Options are single bit flags that can be `OR`'d together. For example, `new BrainFuckInterpreter(11)` will create a brainfuck interpreter that allows the debug hash and has a longer tape that wraps. Included in the library is a BrainFuckOptions object, which makes selecting options a little easier. The above example with options can be written as:
 
 `new BrainFuckInterpreter(
+
     BrainFuckOptions.ALLOWDEBUGHASH ||
+
     BrainFuckOptions.EXTRALARGECELLS||
+
     BrainFuckOptions.WRAPTAPE
+
 )`
 
 |Value|Codename|Effect|Default|
