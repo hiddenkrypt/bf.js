@@ -1,23 +1,23 @@
-"use strict";2
+"use strict";
 
-var bf_options = {
+var BrainFuckOptions = {
 	ALLOWDEBUGHASH: 0x1
 	,EXTRALARGETAPE: 0x2
 	,EXTRALARGECELLS: 0x4
 	,WRAPTAPE: 0x8
 };
 
-var bf_interpreter = function( options ){
-	
-	var TAPE_MAX = options & bf_options.EXTRALARGETAPE? 100000 : 30000;
-	var CELL_MAX = options & bf_options.EXTRALARGECELLS? Math.pow(2, 32)-1 : Math.pow(2, 8) -1;
+function BrainFuckInterpreter ( options ){
+
+	var TAPE_MAX = options & BrainFuckOptions.EXTRALARGETAPE? 100000 : 30000;
+	var CELL_MAX = options & BrainFuckOptions.EXTRALARGECELLS? Math.pow(2, 32)-1 : Math.pow(2, 8) -1;
 	var program = "";
 	var output = "";
 	var input = "";
 	var tape = [0];
 	var pointer = 0;
 	var pc = 0;
-	
+
 	var bfi = {
 		load: function( code ){
 			program = code;
@@ -27,9 +27,9 @@ var bf_interpreter = function( options ){
 		}
 		,reset: function( newOptions ){
 			if(newOptions) options = newOptions;
-			var TAPE_MAX = options & bf_options.EXTRALARGETAPE? 100000 : 30000;
-			var CELL_MAX = options & bf_options.EXTRALARGECELLS? Math.pow(2, 32) : 255;
-			program = output = "";
+			var TAPE_MAX = options & BrainFuckOptions.EXTRALARGETAPE? 100000 : 30000;
+			var CELL_MAX = options & BrainFuckOptions.EXTRALARGECELLS? Math.pow(2, 32) : 255;
+			output = "";
 			pc = pointer = 0;
 			tape = [0];
 		}
@@ -38,66 +38,66 @@ var bf_interpreter = function( options ){
 			while (pc !== program.length){
 		//		console.log("step:"+pc+"  "+program[pc]);
 				switch (program[pc]){
-					case '+': 
-						if( !inc() ){ 
-							console.log(output);	
+					case '+':
+						if( !inc() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
-					case '-': 
-						if( !dec() ){ 
-							console.log(output);	
+					case '-':
+						if( !dec() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
 					case '<':
-						if( !movl() ){ 
-							console.log(output);	
+						if( !movl() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
-					case '>': 
-						if( !movr() ){ 
-							console.log(output);	
+					case '>':
+						if( !movr() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
-					case '.': 
-						if( !prnt() ){ 
-							
-							console.log(output);	
+					case '.':
+						if( !prnt() ){
+
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
-					case ',': 
+					case ',':
 						if( !scan() ){
-							console.log(output);	
-							if( callback) {	callback( output ); } 
-							return; 
+							console.log(output);
+							if( callback) {	callback( output ); }
+							return;
 						}
 						break;
-					case '[': 
-						if( !loop() ){ 
-							console.log(output);	
+					case '[':
+						if( !loop() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
-							return; 
+							return;
 						}
 						break;
 					case ']':
 						if( !endl() ){
-							console.log(output);	
-							if( callback) {	callback( output ); } 
-							return; 
+							console.log(output);
+							if( callback) {	callback( output ); }
+							return;
 						}
 						break;
 					case '#':
-						if( !debug() ){ 
-							console.log(output);	
+						if( !debug() ){
+							console.log(output);
 							if( callback) {	callback( output ); }
 							return;
 						}
@@ -115,8 +115,7 @@ var bf_interpreter = function( options ){
 			}
 		}
 	};
-	
-	
+
 	function inc(){//	+
 		if( tape[pointer] === CELL_MAX ){
 			tape[pointer] = 0;
@@ -125,17 +124,19 @@ var bf_interpreter = function( options ){
 		tape[pointer]++;
 		return true;
 	}
+
 	function dec(){//	-
 		if( tape[pointer] === 0 ){
 			tape[pointer] = CELL_MAX;
 			return true;
-		} 
+		}
 		tape[pointer]--;
 		return true;
 	}
+
 	function movl(){//	<
 		if( pointer === 0 ){
-			if( options & bf_options.WRAPTAPE ){
+			if( options & BrainFuckOptions.WRAPTAPE ){
 				pointer = TAPE_MAX;
 				return true;
 			}
@@ -145,9 +146,10 @@ var bf_interpreter = function( options ){
 		pointer--;
 		return true;
 	}
+
 	function movr(){//	>
 		if( pointer === TAPE_MAX ){
-			if( options & bf_options.WRAPTAPE ){
+			if( options & BrainFuckOptions.WRAPTAPE ){
 				pointer = 0;
 				return true;
 			}
@@ -159,12 +161,12 @@ var bf_interpreter = function( options ){
 		}
 		return true;
 	}
-	
+
 	function prnt(){//	.
 		output += String.fromCharCode( tape[pointer] % 255 );
 		return true;
 	}
-	
+
 	function scan(){//	,
 		if( input.length === 0 ){
 			tape[pointer] = 0;
@@ -174,14 +176,14 @@ var bf_interpreter = function( options ){
 		input = input.slice(1);
 		return true;
 	}
-	
+
 	function loop(){//	[
 		if( tape[pointer] === 0 ){
 			let pcBackup = pc;
 			pc++;
 			let indent = 0;
 			while( program[pc] !== ']' || indent !== 0){
-				
+
 				if( program[pc] === '[' ){
 					indent++;
 				}
@@ -196,6 +198,7 @@ var bf_interpreter = function( options ){
 		}
 		return true;
 	}
+
 	function endl(){//	]
 		var pcBackup = pc;
 		var indent = 0;
@@ -213,9 +216,9 @@ var bf_interpreter = function( options ){
 		pc--;
 		return true;
 	}
-	
+
 	function debug(){
-		if( options & bf_options.ALLOWDEBUGHASH ) {
+		if( options & BrainFuckOptions.ALLOWDEBUGHASH ) {
 			console.log("Debugging: " + tape);
 			let outstring = "";
 			for(let i = 0; i < 10; i++){
@@ -224,10 +227,11 @@ var bf_interpreter = function( options ){
 		}
 		return true;
 	}
+
 	function error( err ){
 		output = err;
 		return false;
 	}
+
 	return bfi;
 };
-
